@@ -1,5 +1,4 @@
-// MadLibs.cpp : This file contains the 'main' function. Program execution begins and ends there.
-
+// Copyright (c) 2021 Justin Lanfermann
 
 #include <iostream>
 #include <fstream>
@@ -22,7 +21,6 @@ const string TOY = ".\\lib\\madlibs_toy.txt";
 const string DISNEY_WORLD = ".\\lib\\madlibs_disney_world.txt";
 
 const vector<string> SCENARIO_LIST{ARCADE, SCHOOL, FUN_PARK, JUNGLE, LIBRARY, VIDEO_GAME, ZOO, BIG_MAC, TOY, DISNEY_WORLD};
-
 
 int madlibs()
 {
@@ -222,7 +220,6 @@ int madlibs()
 		cout << "Invalid input" << endl;
 		return 1;
 	}
-	
 }
 
 int main()
