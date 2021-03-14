@@ -1,11 +1,12 @@
-// Copyright (c) 2021 Justin Lanfermann
+// MadLibs.cpp : This file contains the 'main' function. Program execution begins and ends there.
+
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <tuple>
-
+#include <filesystem>
 
 using namespace std;
 
@@ -20,41 +21,106 @@ const string BIG_MAC = ".\\lib\\madlibs_big_mac.txt";
 const string TOY = ".\\lib\\madlibs_toy.txt";
 const string DISNEY_WORLD = ".\\lib\\madlibs_disney_world.txt";
 
-const vector<string> SCENARIO_LIST{ARCADE, SCHOOL, FUN_PARK, JUNGLE, LIBRARY, VIDEO_GAME, ZOO, BIG_MAC, TOY, DISNEY_WORLD};
+//const vector<string> scenario_list{ARCADE, SCHOOL, FUN_PARK, JUNGLE, LIBRARY, VIDEO_GAME, ZOO, BIG_MAC, TOY, DISNEY_WORLD};
+
 
 int madlibs()
 {
-	printf("Pick a scenario: \n1) At the Arcade!		2) The First Day of School		3) The Fun Park!\n"
-		   "4) In The Jungle!		5) At the Library			6) Make me a Video Game!\n" 
-		   "7) A Day at the Zoo!		8) Big Mac Who?				9) The Great New Toy!\n"
-		   "10) My Trip to Disney World!\n"); 
+
+	string path = ".\\lib\\";
+	vector<string> scenario_list;
+	vector<string> name_list;
+	vector<string> save_string;
+
+	for (const auto& entry : filesystem::directory_iterator(path))
+	{
+		
+		string path_string{ entry.path().string() };
+
+		int it = path_string.find("_");
+
+		scenario_list.push_back(path_string);
+
+		path_string.erase(0, it+1);
+		path_string[0] = toupper(path_string[0]);
+
+		save_string.push_back(path_string);
+
+		for (int i = 0; char& c : path_string)
+		{
+			if (c == '_')
+			{
+				path_string[i+1] = toupper(path_string[i+1]);
+				path_string[i] = ' ';
+			}
+			i++;
+		}
+		path_string.erase(path_string.size() - 4, 4); 
+
+		if (path_string.size() < 27)
+		{
+			int padding = 27 - path_string.size();
+
+			for (int i = 0; i < padding; ++i)
+			{
+				path_string.append(" ");
+			}
+		}
+		if (path_string.size() > 27)
+		{
+			int rem_padding = path_string.size() - 24;
+
+			for (int i = 0; i < rem_padding; i++)
+			{
+				path_string.pop_back();
+			}
+			path_string.append("...");
+		}
+		name_list.push_back(path_string);
+	}
+	cout << "Pick a Scenario:" << endl;
+
+	for (int i = 0; string scenario : scenario_list)
+	{
+		
+		if ((i+1) % 3 == 0)
+		{
+			printf("%d) %s		\n", i+1, name_list[i].c_str());
+		}
+		else
+		{
+			printf("%d) %s		", i+1, name_list[i].c_str());
+		}
+		i++;
+	}
+	cout << endl;
 
 	int scenario;
 	cin >> scenario;
 	cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	
-	vector<string> my_list = {};
+	vector<string> word_list = {};
 	string word;
 
-	if (scenario - 1 < SCENARIO_LIST.size())
+	if (scenario - 1 < scenario_list.size())
 	{
-		ifstream myfile(SCENARIO_LIST[scenario - 1]);
+		ifstream in_file(scenario_list[scenario - 1]);
 
-		if (myfile.is_open())
+		if (in_file.is_open())
 		{
-			while (myfile >> word)
+			while (in_file >> word)
 			{
-				my_list.push_back(word);
+				word_list.push_back(word);
 			}
-			myfile.close();
+			in_file.close();
 
 			vector<string> prompt_vector;
 			vector<tuple<string, int, int>> replace_list;
 
-			for (int i = 0; i < my_list.size(); i++)
+			for (int i = 0; i < word_list.size(); i++)
 			{
 				string prompt;
-				prompt = my_list[i];
+				prompt = word_list[i];
 
 				if (prompt.length() > 2)
 				{
@@ -81,15 +147,15 @@ int madlibs()
 
 							while (prompt_open)
 							{
-								if (my_list[i + z][my_list[i + z].length()] == '>' || my_list[i + z][my_list[i + z].length() - 1] == '>')
+								if (word_list[i + z][word_list[i + z].length()] == '>' || word_list[i + z][word_list[i + z].length() - 1] == '>')
 								{
 									if (z == 1)
 									{
-										prompt.append(" " + my_list[i + z]);
+										prompt.append(" " + word_list[i + z]);
 									}
 									else
 									{
-										prompt.append(my_list[i + z]);
+										prompt.append(word_list[i + z]);
 									}
 									prompt.erase(remove(prompt.begin(), prompt.end(), '<'), prompt.end());
 									prompt.erase(remove(prompt.begin(), prompt.end(), '>'), prompt.end());
@@ -109,11 +175,11 @@ int madlibs()
 								{
 									if (z == 1)
 									{
-										prompt.append(" " + my_list[i + z] + " ");
+										prompt.append(" " + word_list[i + z] + " ");
 									}
 									else
 									{
-										prompt.append(my_list[i + z] + " ");
+										prompt.append(word_list[i + z] + " ");
 									}
 									z++;
 								}
@@ -126,7 +192,7 @@ int madlibs()
 			{
 				if (get<2>(replace_list[i]) == 0)
 				{
-					my_list[get<1>(replace_list[i])] = get<0>(replace_list[i]);
+					word_list[get<1>(replace_list[i])] = get<0>(replace_list[i]);
 				}
 			}
 			int index_shift = 0;
@@ -138,8 +204,8 @@ int madlibs()
 					int start_point = get<1>(replace_list[i]) - index_shift;
 					int add_to_start = get<2>(replace_list[i]);
 
-					my_list.erase(my_list.begin() + start_point, my_list.begin() + start_point + add_to_start + 1);
-					my_list.insert(my_list.begin() + start_point, get<0>(replace_list[i]));
+					word_list.erase(word_list.begin() + start_point, word_list.begin() + start_point + add_to_start + 1);
+					word_list.insert(word_list.begin() + start_point, get<0>(replace_list[i]));
 
 					index_shift += add_to_start;
 				}
@@ -147,12 +213,12 @@ int madlibs()
 			const vector<string> SPECIAL_CHARS = { ".", ",", "!", "?", "'", "@", "\"" };
 			string full_text;
 
-			for (int i = 0; i < my_list.size(); i++)
+			for (int i = 0; i < word_list.size(); i++)
 			{
-				string current_word = my_list[i];
-				if (i + 1 < my_list.size())
+				string current_word = word_list[i];
+				if (i + 1 < word_list.size())
 				{
-					if (find(SPECIAL_CHARS.begin(), SPECIAL_CHARS.end(), my_list[i + 1]) != SPECIAL_CHARS.end())
+					if (find(SPECIAL_CHARS.begin(), SPECIAL_CHARS.end(), word_list[i + 1]) != SPECIAL_CHARS.end())
 					{
 						cout << current_word;
 						full_text.append(current_word);
@@ -180,14 +246,18 @@ int madlibs()
 			}
 			if (write_to_file[0] == 'y')
 			{
-				const string save_path = (".\\Saved\\" + SCENARIO_LIST[scenario - 1].substr(0, (SCENARIO_LIST[scenario - 1].size())));
+				if (!filesystem::exists(".\\saved\\"))
+				{
+					filesystem::create_directory(".\\saved\\");
+				}
+				const string save_path = (".\\saved\\" + save_string[scenario - 1].substr(0, (save_string[scenario - 1].size())));
 
 				ofstream outfile;
 
 				outfile.open(save_path, ios::app);
 				outfile << full_text << "\n\n\n\n";
 				outfile.close();
-				cout << "Saved\n";
+				cout << "\nSaved\n";
 			}
 			cout << "\n\n(n) Would you like to play again? (y/n)\n";
 
@@ -217,9 +287,10 @@ int madlibs()
 	}
 	else
 	{
-		cout << "Invalid input" << endl;
+		cout << "Invalid input\n" << endl;
 		return 1;
 	}
+	
 }
 
 int main()
