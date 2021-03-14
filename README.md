@@ -2,7 +2,7 @@
 A basic C++ program where you can choose from multiple pre-defined texts and fill in gaps madlibs style
 ## Installation
 Clone this repository and compile the madlibs.cpp file.\
-The put the .exe file in the same directory as /lib and /saved\
+The put the .exe file in the same directory as /lib and /Saved\
 You're Done!
 ## Add your own files
 Currently you have to add a your text in a .txt file into the lib folder and add some code to the source.\
