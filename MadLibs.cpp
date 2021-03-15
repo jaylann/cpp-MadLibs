@@ -10,31 +10,18 @@
 
 using namespace std;
 
-const string ARCADE = ".\\lib\\madlibs_arcade.txt";
-const string SCHOOL = ".\\lib\\madlibs_school.txt";
-const string FUN_PARK = ".\\lib\\madlibs_fun_park.txt";
-const string JUNGLE = ".\\lib\\madlibs_jungle.txt";
-const string LIBRARY = ".\\lib\\madlibs_library.txt";
-const string VIDEO_GAME = ".\\lib\\madlibs_video_game.txt";
-const string ZOO = ".\\lib\\madlibs_zoo.txt";
-const string BIG_MAC = ".\\lib\\madlibs_big_mac.txt";
-const string TOY = ".\\lib\\madlibs_toy.txt";
-const string DISNEY_WORLD = ".\\lib\\madlibs_disney_world.txt";
-
-//const vector<string> scenario_list{ARCADE, SCHOOL, FUN_PARK, JUNGLE, LIBRARY, VIDEO_GAME, ZOO, BIG_MAC, TOY, DISNEY_WORLD};
-
 
 int madlibs()
 {
 
 	string path = ".\\lib\\";
+	
 	vector<string> scenario_list;
 	vector<string> name_list;
 	vector<string> save_string;
 
 	for (const auto& entry : filesystem::directory_iterator(path))
-	{
-		
+	{	
 		string path_string{ entry.path().string() };
 
 		int it = path_string.find("_");
@@ -82,7 +69,6 @@ int madlibs()
 
 	for (int i = 0; string scenario : scenario_list)
 	{
-		
 		if ((i+1) % 3 == 0)
 		{
 			printf("%d) %s		\n", i+1, name_list[i].c_str());
